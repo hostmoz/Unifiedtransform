@@ -33,6 +33,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get( '/_debugbar/assets/stylesheets', '\Barryvdh\Debugbar\Controllers\AssetController@css' );
+Route::get( '/_debugbar/assets/javascript', '\Barryvdh\Debugbar\Controllers\AssetController@js' );
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
@@ -104,10 +107,12 @@ Route::middleware(['auth','teacher'])->group(function (){
 });
 
 Route::middleware(['auth','admin'])->group(function (){
-  Route::get('academic/syllabus', 'SyllabusController@create');
+  Route::get('academic/syllabus', 'SyllabusController@index');
+  Route::get('academic/syllabus/{class_id}', 'SyllabusController@create');
   Route::get('academic/notice', 'NoticeController@create');
   Route::get('academic/event', 'EventController@create');
-  Route::get('academic/routine', 'RoutineController@create');
+  Route::get('academic/routine', 'RoutineController@index');
+  Route::get('academic/routine/{section_id}', 'RoutineController@create');
   Route::get('academic/remove/syllabus/{id}', 'SyllabusController@update');
   Route::get('academic/remove/notice/{id}', 'NoticeController@update');
   Route::get('academic/remove/event/{id}', 'EventController@update');
@@ -244,3 +249,14 @@ Route::middleware(['auth','teacher'])->group(function (){
 //     return response()->download($pathToFile);
 //   });
 // });
+
+
+// View Emails - in browser
+Route::prefix('emails')->group(function () {
+  // Welcome Email
+  Route::get('/welcome', function () {
+      $user = App\User::find(1);
+      $password = "ABCXYZ";
+      return new App\Mail\SendWelcomeEmailToUser($user, $password);
+  });
+});
